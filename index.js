@@ -37,7 +37,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/profile-image',  profileImage);
-app.use('/api/usersads',authMiddleware, userAds);
+app.use('/api/usersads', userAds);
 app.use('/api/userlogin' ,userLogin);
 app.use('/api/allads', productList);
 app.use('/api/viewsads', myAdsRouter);

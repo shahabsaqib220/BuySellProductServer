@@ -16,7 +16,7 @@ router.put("/soldout/:adId", authMiddleware, async (req, res) => {
     }
 
     // Update ad status
-    ad.adStatus = true;
+    ad.adStatus = "sold";
     const updatedAd = await ad.save();
 
     return res.status(200).json({ message: 'Ad marked as sold', ad: updatedAd });
@@ -36,12 +36,12 @@ router.get('/ads', authMiddleware, async (req, res) => {
       const startIndex = (page - 1) * limit;
   
       // Fetch ads where adStatus is true
-      const ads = await Ad.find({ adStatus: true })
+      const ads = await Ad.find({ adStatus: "available" })
         .skip(startIndex)
         .limit(limit);
   
       // Get the total count of ads
-      const totalAds = await Ad.countDocuments({ adStatus: true });
+      const totalAds = await Ad.countDocuments({ adStatus: "available" });
   
       // Return paginated ads
       res.status(200).json({

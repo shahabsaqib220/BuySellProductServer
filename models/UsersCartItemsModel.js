@@ -33,11 +33,7 @@ const cartItemSchema = new mongoose.Schema({
     type: Number,
     default: 1, // Default quantity is 1
   },
-  adStatus: { 
-    type: String, 
-    enum: ["available", "sold"], // Valid status values
-    default: "available" // Default to "available"
-  },
+  adStatus: { type: String, enum: ['available', 'sold', 'deleted'], default: 'available' }, // Include adStatus
   addedAt: {
     type: Date,
     default: Date.now, // Timestamp of when the item was added

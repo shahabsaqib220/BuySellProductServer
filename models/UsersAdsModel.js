@@ -53,11 +53,7 @@ const adsSchema = new mongoose.Schema({
     type: String, // Store Firebase URLs
     required: true
   }],
-  adStatus: { 
-    type: String, 
-    enum: ["available", "sold"], // Valid status values
-    default: "available" // Default to "available"
-  },
+  adStatus: { type: String, enum: ['available', 'sold', 'deleted'], default: 'available' }, // Include adStatus
   createdAt: { 
     type: Date, 
     default: Date.now 
