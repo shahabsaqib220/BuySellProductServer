@@ -60,6 +60,40 @@ router.post("/shopping", authenticate, async (req, res) => {
   }
 });
 
+router.delete('/:itemId', authenticate, async (req, res) => {
+  console.log('UserID:', req.userId); // For debugging
+  console.log('ItemID:', req.params.itemId); 
+  console.log('Request Params:', req.params); // To see if itemId is passed
+  console.log('ItemID:', req.params.itemId); // Check if itemId is undefined
+  console.log('UserID:', req.userId); // Check if userId is coming from the middleware
+  try {
+    const userId = req.userId; // Ensure this matches your auth middleware
+    const { itemId } = req.params;
+
+    // Find the cart item with the userId and itemId
+    const cartItem = await Cart.findOne({ _id: itemId, userId: userId });
+
+    // Check if the cart item exists and belongs to the user
+    if (!cartItem) {
+      return res.status(404).json({ message: 'Cart item not found or not authorized' });
+    }
+
+    // Delete the cart item
+    await Cart.deleteOne({ _id: itemId, userId: userId });
+
+    return res.status(200).json({ message: 'Item deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting cart item:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
+
+
+
+
 // Endpoint to fetch items from the shopping cart
 router.get("/cart", authenticate, async (req, res) => {
   const userId = req.userId; // Get userId from the authentication middleware
