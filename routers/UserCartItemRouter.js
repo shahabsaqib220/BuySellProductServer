@@ -53,7 +53,7 @@ router.post("/shopping", authenticate, async (req, res) => {
       await cartItem.save();
     }
 
-    res.status(201).json({ message: "Item added to cart successfully", cartItem });
+    res.status(201).json({ message: "Item added to cart successfully", cartItem, adId: ad._id }); // Include adId in the response
   } catch (error) {
     console.error("Error adding item to cart:", error);
     res.status(500).json({ message: "Error adding item to cart", error });
@@ -81,17 +81,17 @@ router.get("/cart", authenticate, async (req, res) => {
       } else if (ad.adStatus === "sold") {
         cartItem.adStatus = "sold"; 
       } else {
-        
         cartItem.adStatus = "available"; 
       }
 
-      
       await cartItem.save();
 
-        return cartItem;
+      return {
+        ...cartItem.toObject(), // Convert the cartItem to an object to append adId
+        adId: ad._id // Add adId to the response
+      };
     }));
 
-   
     res.json(updatedCartItems);
   } catch (error) {
     res.status(500).json({ message: "Error fetching cart items", error });

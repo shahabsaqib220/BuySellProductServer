@@ -18,6 +18,7 @@ const userProfileImage = require('./routers/userProfileImageRouter')
 const bodyParser = require('body-parser');
 const soldOutRouter = require("./routers/UserSoldOutProductRouter")
 const userCartItem = require("./routers/UserCartItemRouter")
+const cartItemRouter = require("./routers/CartItemNavigatiorRouter")
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use('/api/product/details/others',OtherRelatedProductRouter );
 app.use('/api/user-profile-image', userProfileImage );
 app.use('/api/userproducts/solded', soldOutRouter );
 app.use('/api/usercart/item', userCartItem );
+app.use('/api/usercart/navigate', cartItemRouter );
 
 
 
