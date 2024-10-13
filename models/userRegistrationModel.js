@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  profileImageUrl: { type: String, required: false, default: null },
+  profileImageUrl: { type: String, default: null },
   securityQuestions: [
     {
       question: { type: String, required: true },
@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
 
 // Hash the password before saving the user
 userSchema.pre('save', async function (next) {
+  // Only hash the password if it has been modified or is new
   if (!this.isModified('password')) return next();
 
   const salt = await bcrypt.genSalt(10);
@@ -30,15 +31,14 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+// Generate JWT token
 userSchema.methods.generateAuthToken = function () {
-  const token = jwt.sign(
-    { userId: this._id, email: this.email },  
-    process.env.JWT_SECRET,  
-    { expiresIn: '24h' }  // Extending to 24 hours for testing
+  return jwt.sign(
+    { userId: this._id, email: this.email },
+    process.env.JWT_SECRET,
+    { expiresIn: '24h' }
   );
-  return token;
 };
-
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;

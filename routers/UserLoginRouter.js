@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const User = require('../models/userRegistrationModel');
+const User = require('../models/userRegistrationModel'); // Make sure this is the correct path
+const bcrypt = require('bcryptjs'); // Ensure bcrypt is required
 const jwt = require('jsonwebtoken');
 
 router.post('/login', async (req, res) => {
@@ -20,7 +20,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Compare password
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await bcrypt.compare(password, user.password); // Explicitly using bcrypt
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
