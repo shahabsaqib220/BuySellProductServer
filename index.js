@@ -19,7 +19,7 @@ const bodyParser = require('body-parser');
 const soldOutRouter = require("./routers/UserSoldOutProductRouter")
 const userCartItem = require("./routers/UserCartItemRouter")
 const cartItemRouter = require("./routers/CartItemNavigatiorRouter")
-
+const PasswordChangeRouter = require("./routers/PasswordChangeRouter")
 const app = express();
 
 require('dotenv').config();
@@ -49,7 +49,7 @@ app.use('/api/user-profile-image', userProfileImage );
 app.use('/api/userproducts/solded', soldOutRouter );
 app.use('/api/usercart/item', userCartItem );
 app.use('/api/usercart/navigate', cartItemRouter );
-
+app.use('/api/security', PasswordChangeRouter);
 
 
 
