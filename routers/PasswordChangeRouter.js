@@ -20,8 +20,8 @@ const transporter = nodemailer.createTransport({
 
 
 // Verify old password
-router.post('/verify-old-password', authMiddleware,async (req, res) => {
-  const { email, password } = req.body;
+router.post('/verify-old-password', authMiddleware, async (req, res) => {
+  const { email, oldPassword } = req.body;  // Changed 'password' to 'oldPassword'
 
   try {
     const user = await User.findOne({ email });
@@ -29,7 +29,7 @@ router.post('/verify-old-password', authMiddleware,async (req, res) => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(oldPassword, user.password);  // Compare with 'oldPassword'
     if (!isMatch) {
       return res.status(400).json({ success: false, message: 'Incorrect password' });
     }
@@ -39,6 +39,7 @@ router.post('/verify-old-password', authMiddleware,async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error', error });
   }
 });
+
 
 
 // Generate OTP and send it via email
@@ -87,48 +88,74 @@ router.post("/generate-otp", authMiddleware, async (req, res) => {
 });
 
 
-// router.post('/verify-old-password',authMiddleware ,async (req, res) => {
-//   const { email, oldPassword } = req.body;
+router.post('/update-questions', async (req, res) => {
+  const { email, newQuestions, newAnswers } = req.body;
 
-//   try {
-//       const user = await User.findOne({ email });
+  try {
+    // Step 1: Find the user by email
+    const user = await User.findOne({ email });
 
-//       if (!user) {
-//           return res.status(404).json({ message: 'User not found' });
-//       }
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
 
-//       // Compare the hashed password in the database with the provided oldPassword
-//       const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    // Step 2: Validate that the questions are not the same
+    if (newQuestions.question1 === newQuestions.question2) {
+      return res.status(400).json({ success: false, message: 'Security questions must be different.' });
+    }
 
-//       if (!isPasswordValid) {
-//           return res.status(401).json({ message: 'Old password is incorrect' });
-//       }
+    if (!newAnswers.answer1 || !newAnswers.answer2) {
+      return res.status(400).json({ success: false, message: 'Answers must not be empty.' });
+    }
 
-//       res.json({ success: true, message: 'Old password verified successfully' });
-//   } catch (error) {
-//       res.status(500).json({ message: 'Server error' });
-//   }
-// });
+    // Step 3: Hash the new answers
+    const hashedAnswer1 = await bcrypt.hash(newAnswers.answer1, 10);
+    const hashedAnswer2 = await bcrypt.hash(newAnswers.answer2, 10);
+
+    // Update the user's security questions and hashed answers
+    user.securityQuestions = [
+      { question: newQuestions.question1, answer: hashedAnswer1 },
+      { question: newQuestions.question2, answer: hashedAnswer2 }
+    ];
+
+    // Save the updated user information
+    await user.save();
+
+    // Step 4: Return success response
+    return res.status(200).json({
+      success: true,
+      message: 'Security questions updated successfully.',
+    });
+
+  } catch (error) {
+    // Handle any errors
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error.',
+    });
+  }
+});
 
 
-// Verify OTP and clear from the ChangePassword collection after verification
+
+
+
+
 router.post("/verify-otp", authMiddleware, async (req, res) => {
-    const { otp } = req.body; // User-provided OTP
+    const { otp } = req.body;
     console.log("otp received:", otp);
   
     try {
-      // Fetch the OTP entry for the user from the ChangePassword collection
       const changePasswordEntry = await ChangePassword.findOne({ userId: req.userId });
       if (!changePasswordEntry) {
         return res.status(400).json({ message: "Invalid or Expired OTP" });
       }
   
-      // Check if the OTP matches
-      if (changePasswordEntry.otp.code !== parseInt(otp)) {  // Ensure correct comparison with parseInt
+      if (changePasswordEntry.otp.code !== parseInt(otp)) {  
         return res.status(400).json({ message: "Invalid OTP" });
       }
   
-      // Check if the OTP has expired
       if (Date.now() > changePasswordEntry.otp.expiresAt) {
         return res.status(400).json({ message: "OTP expired" });
       }
