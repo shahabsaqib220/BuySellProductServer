@@ -1,6 +1,6 @@
 const express = require("express");
 const User = require("../models/userRegistrationModel");
-const ChangePassword = require("../models/ChangePasswordModel"); // New ChangePassword model
+const ChangePassword = require("../models/ChangePasswordModel"); 
 const crypto = require("crypto");
 const authMiddleware = require("../middleware/authMiddleware");
 const bcrypt = require('bcryptjs');
@@ -17,6 +17,29 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASSWORD,
   },
 });
+
+
+// Verify old password
+router.post('/verify-old-password', authMiddleware,async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: 'Incorrect password' });
+    }
+
+    return res.json({ success: true });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Server error', error });
+  }
+});
+
 
 // Generate OTP and send it via email
 router.post("/generate-otp", authMiddleware, async (req, res) => {
@@ -62,6 +85,30 @@ router.post("/generate-otp", authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+
+// router.post('/verify-old-password',authMiddleware ,async (req, res) => {
+//   const { email, oldPassword } = req.body;
+
+//   try {
+//       const user = await User.findOne({ email });
+
+//       if (!user) {
+//           return res.status(404).json({ message: 'User not found' });
+//       }
+
+//       // Compare the hashed password in the database with the provided oldPassword
+//       const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+
+//       if (!isPasswordValid) {
+//           return res.status(401).json({ message: 'Old password is incorrect' });
+//       }
+
+//       res.json({ success: true, message: 'Old password verified successfully' });
+//   } catch (error) {
+//       res.status(500).json({ message: 'Server error' });
+//   }
+// });
 
 
 // Verify OTP and clear from the ChangePassword collection after verification
