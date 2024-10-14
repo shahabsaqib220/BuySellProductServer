@@ -53,6 +53,12 @@ app.use(process.env.API_V14_OAUTH, PasswordChangeRouter);
 
 
 
+app.get('https://buy-sell-product-server.vercel.app/', (req, res) => {
+    res.send('Hello from Express');
+  });
+
+
+
 
 
 
