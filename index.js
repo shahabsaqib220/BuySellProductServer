@@ -40,7 +40,7 @@ app.use(cors({
 app.use(express.json());
 
 
-app.use(process.env.API_V1_OAUTH, authRoutes);
+app.use("/api/auth", authRoutes);
 app.use(process.env.API_V2_OAUTH,  profileImage);
 app.use(process.env.API_V3_OAUTH, userAds);
 app.use(process.env.API_V4_OAUTH,userLogin);
