@@ -32,7 +32,11 @@ app.use(bodyParser.json());
 
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // Allow only your frontend domain
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  }));
 app.use(express.json());
 
 
