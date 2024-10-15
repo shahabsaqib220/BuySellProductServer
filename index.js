@@ -21,7 +21,6 @@ const userCartItem = require("./routers/UserCartItemRouter")
 const cartItemRouter = require("./routers/CartItemNavigatiorRouter")
 const PasswordChangeRouter = require("./routers/PasswordChangeRouter")
 const app = express();
-const timeout = require('connect-timeout'); 
 
 require('dotenv').config();
 
