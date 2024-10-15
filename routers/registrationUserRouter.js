@@ -24,7 +24,6 @@ router.post('/send-otp', async (req, res) => {
     // Check if the email already exists in the User collection
     const user = await User.findOne({ email });
     if (user) {
-      console.log('User with email already exists:', email);
       return res.status(400).json({ message: 'Email already exists!' });
     }
 
@@ -32,7 +31,6 @@ router.post('/send-otp', async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString(); 
     const expiresIn = new Date(Date.now() + 5 * 60 * 1000); // OTP expiration time (5 minutes)
 
-    console.log(`Generated OTP: ${otp} for email: ${email}`);
 
     // If OTP already exists for this email, remove the old one
     await Otp.findOneAndDelete({ email });
@@ -45,7 +43,6 @@ router.post('/send-otp', async (req, res) => {
     });
 
     const savedOtp = await newOtp.save();  // Save OTP to the database
-    console.log(`OTP saved to database for ${email}:`, savedOtp);
 
     // Send OTP email
     const mailOptions = {
@@ -58,15 +55,12 @@ router.post('/send-otp', async (req, res) => {
     // Send the email asynchronously
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.error('Error sending email:', error.message);
         return res.status(500).json({ message: 'Failed to send OTP. Please try again.' });
       }
-      console.log('Email sent: ' + info.response);
       return res.json({ message: 'OTP sent successfully!' });
     });
 
   } catch (error) {
-    console.error('Error in send-otp route:', error);
     return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
   }
 });
