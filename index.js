@@ -28,7 +28,7 @@ app.use(express.json());
 
 
 
-app.use('/api/userlogin/login',userLogin);
+app.use('/api/userlogin',userLogin);
 
 
 
