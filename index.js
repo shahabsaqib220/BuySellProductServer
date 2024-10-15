@@ -34,11 +34,19 @@ app.use(bodyParser.json());
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({
-    origin: 'http://localhost:3000/', // Add your frontend's domain here
-    methods: 'GET,POST',
-    allowedHeaders: 'Content-Type,Authorization',
-  }));app.use(express.json());
-
+    origin: 'http://localhost:3000', // Allow only your frontend origin
+    methods: ['GET', 'POST'], // Define allowed methods
+    credentials: true, // Allow credentials (cookies, etc.)
+  }));
+app.use(express.json());
+app.use((req, res, next) => {
+    res.setTimeout(5000, () => {
+      console.log('Request has timed out.');
+      res.status(408).send('Request timed out.');
+    });
+    next();
+  });
+  
 
 app.use(process.env.API_V1_OAUTH, authRoutes);
 app.use(process.env.API_V2_OAUTH,  profileImage);
