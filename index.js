@@ -34,13 +34,13 @@ app.use(bodyParser.json());
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({
-    origin: 'http://localhost:3000', // or '*' to allow all origins (not recommended for production)
-    credentials: true, // Allows the server to respond with cookies
-  }));
-app.use(express.json());
+    origin: 'http://localhost:3000/', // Add your frontend's domain here
+    methods: 'GET,POST',
+    allowedHeaders: 'Content-Type,Authorization',
+  }));app.use(express.json());
 
 
-app.use("/api/auth", authRoutes);
+app.use(process.env.API_V1_OAUTH, authRoutes);
 app.use(process.env.API_V2_OAUTH,  profileImage);
 app.use(process.env.API_V3_OAUTH, userAds);
 app.use(process.env.API_V4_OAUTH,userLogin);
