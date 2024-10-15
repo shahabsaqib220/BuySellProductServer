@@ -9,6 +9,10 @@ const userLogin= require('./routers/UserLoginRouter')
 const bodyParser = require('body-parser');
 
 const app = express();
+app.use(cors({
+    origin: 'http://localhost:3000' // Allow only this origin
+  }));
+  
 
 require('dotenv').config();
 
@@ -20,7 +24,6 @@ app.use(bodyParser.json());
 
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
 app.use(express.json());
 
 
