@@ -21,37 +21,41 @@ const userCartItem = require("./routers/UserCartItemRouter")
 const cartItemRouter = require("./routers/CartItemNavigatiorRouter")
 const PasswordChangeRouter = require("./routers/PasswordChangeRouter")
 const app = express();
+const timeout = require('connect-timeout'); 
 
 require('dotenv').config();
 
-app.use(cors({
-    origin: 'http://localhost:3000'
-  }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.use(timeout('10s')); // Set a 10-second timeout for all requests
+app.use((req, res, next) => {
+  if (!req.timedout) next();
+});
 
 
 
 
 const PORT = process.env.PORT || 3000;
 
+app.use(cors());
 app.use(express.json());
 
 
-// app.use(process.env.API_V1_OAUTH, authRoutes);
-app.use("/api/profile-image",  profileImage);
-// app.use(process.env.API_V3_OAUTH, userAds);
-app.use("/api/userlogin",userLogin);
-// app.use(process.env.API_V5_OAUTH, productList);
-// app.use(process.env.API_V6_OAUTH, myAdsRouter);
-// app.use(process.env.API_V7_OAUTH, adDelete);
-// app.use(process.env.API_V8_OAUTH,ProductDetailsRouter );
-// app.use(process.env.API_V9_OAUTH,OtherRelatedProductRouter );
-// app.use(process.env.API_V10_OAUTH, userProfileImage );
-// app.use(process.env.API_V11_OAUTH, soldOutRouter );
-// app.use(process.env.API_V12_OAUTH, userCartItem );
-// app.use(process.env.API_V13_OAUTH, cartItemRouter );
-// app.use(process.env.API_V14_OAUTH, PasswordChangeRouter);
+app.use(process.env.API_V1_OAUTH, authRoutes);
+app.use(process.env.API_V2_OAUTH,  profileImage);
+app.use(process.env.API_V3_OAUTH, userAds);
+app.use(process.env.API_V4_OAUTH,userLogin);
+app.use(process.env.API_V5_OAUTH, productList);
+app.use(process.env.API_V6_OAUTH, myAdsRouter);
+app.use(process.env.API_V7_OAUTH, adDelete);
+app.use(process.env.API_V8_OAUTH,ProductDetailsRouter );
+app.use(process.env.API_V9_OAUTH,OtherRelatedProductRouter );
+app.use(process.env.API_V10_OAUTH, userProfileImage );
+app.use(process.env.API_V11_OAUTH, soldOutRouter );
+app.use(process.env.API_V12_OAUTH, userCartItem );
+app.use(process.env.API_V13_OAUTH, cartItemRouter );
+app.use(process.env.API_V14_OAUTH, PasswordChangeRouter);
 
 
 
