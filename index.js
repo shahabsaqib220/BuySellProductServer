@@ -37,7 +37,7 @@ app.use(express.json());
 
 
 app.use(process.env.API_V1_OAUTH, authRoutes);
-app.use(process.env.API_V2_OAUTH,  profileImage);
+app.use("/api/profile-image",  profileImage);
 app.use(process.env.API_V3_OAUTH, userAds);
 app.use("/api/userlogin",userLogin);
 app.use(process.env.API_V5_OAUTH, productList);
