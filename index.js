@@ -71,7 +71,7 @@ app.get('/', (req, res) => {
 
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_DB_URL,{
+        await mongoose.connect("mongodb+srv://shahabsaqib220:Pakistan1122@cluster0.ugd18.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",{
            
         })
         console.log("MongoDb Connected");
