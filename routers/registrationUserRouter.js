@@ -71,67 +71,67 @@ router.post('/send-otp', async (req, res) => {
 
 // POST /verify-otp
 // POST /verify-otp
-router.post('/verify-otp', async (req, res) => {
-    const { otp, email } = req.body;
+// router.post('/verify-otp', async (req, res) => {
+//     const { otp, email } = req.body;
   
-    try {
-      // Retrieve OTP from the database
-      const otpRecord = await Otp.findOne({ email });
+//     try {
+//       // Retrieve OTP from the database
+//       const otpRecord = await Otp.findOne({ email });
   
-      if (!otpRecord) {
-        return res.status(400).json({ code: 'OTP_NOT_FOUND', message: 'OTP not found or expired' });
-      }
+//       if (!otpRecord) {
+//         return res.status(400).json({ code: 'OTP_NOT_FOUND', message: 'OTP not found or expired' });
+//       }
   
-      // Check if the OTP has expired
-      if (Date.now() > otpRecord.expiresIn) {
-        await Otp.findOneAndDelete({ email }); // Delete expired OTP
-        return res.status(400).json({ code: 'OTP_EXPIRED', message: 'OTP has expired' });
-      }
+//       // Check if the OTP has expired
+//       if (Date.now() > otpRecord.expiresIn) {
+//         await Otp.findOneAndDelete({ email }); // Delete expired OTP
+//         return res.status(400).json({ code: 'OTP_EXPIRED', message: 'OTP has expired' });
+//       }
   
-      // Verify the OTP
-      if (otp !== otpRecord.otp) {
-        return res.status(400).json({ code: 'INVALID_OTP', message: 'Invalid OTP' });
-      }
+//       // Verify the OTP
+//       if (otp !== otpRecord.otp) {
+//         return res.status(400).json({ code: 'INVALID_OTP', message: 'Invalid OTP' });
+//       }
   
-      // OTP is valid, proceed to the next step (e.g., account creation)
-      await Otp.findOneAndDelete({ email });
+//       // OTP is valid, proceed to the next step (e.g., account creation)
+//       await Otp.findOneAndDelete({ email });
   
-      return res.json({ message: 'OTP verified successfully!' });
-    } catch (error) {
-      console.error('Error in verify-otp:', error);
-      return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
-    }
-});
+//       return res.json({ message: 'OTP verified successfully!' });
+//     } catch (error) {
+//       console.error('Error in verify-otp:', error);
+//       return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
+//     }
+// });
 
 
-// POST /register
-router.post('/register', async (req, res) => {
-  const { name, email, password, securityQuestions } = req.body;
+// // POST /register
+// router.post('/register', async (req, res) => {
+//   const { name, email, password, securityQuestions } = req.body;
 
-  try {
-    // Hash the password (bcrypt automatically generates a salt internally)
-    const hashedPassword = await bcrypt.hash(password, 10);
+//   try {
+//     // Hash the password (bcrypt automatically generates a salt internally)
+//     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user instance
-    const newUser = new User({
-      name,
-      email,
-      password, // Save the hashed password
-      securityQuestions, // Save security questions
-    });
+//     // Create a new user instance
+//     const newUser = new User({
+//       name,
+//       email,
+//       password, // Save the hashed password
+//       securityQuestions, // Save security questions
+//     });
 
-    // Save the user to the database
-    await newUser.save();
+//     // Save the user to the database
+//     await newUser.save();
 
-    // Optional: Clear OTP after successful registration
-    await Otp.findOneAndDelete({ email });
+//     // Optional: Clear OTP after successful registration
+//     await Otp.findOneAndDelete({ email });
 
-    return res.json({ message: 'User registered successfully!' });
-  } catch (error) {
-    console.error('Error during registration:', error);
-    return res.status(500).json({ message: 'Registration failed. Please try again.' });
-  }
-});
+//     return res.json({ message: 'User registered successfully!' });
+//   } catch (error) {
+//     console.error('Error during registration:', error);
+//     return res.status(500).json({ message: 'Registration failed. Please try again.' });
+//   }
+// });
 
 
 
