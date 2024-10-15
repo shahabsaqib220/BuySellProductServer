@@ -33,7 +33,10 @@ app.use(bodyParser.json());
 
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // or '*' to allow all origins (not recommended for production)
+    credentials: true, // Allows the server to respond with cookies
+  }));
 app.use(express.json());
 
 
