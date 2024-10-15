@@ -14,7 +14,9 @@ router.post('/login', async (req, res) => {
 
   try {
     // Find the user by email
+    console.time('User findOne query');
     const user = await User.findOne({ email });
+    console.timeEnd('User findOne query');
     if (!user) {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
