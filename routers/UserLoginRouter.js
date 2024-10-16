@@ -8,12 +8,9 @@ const loginMiddleware = require('../middleware/loginMiddleware'); // Adjust the 
 // Use the middleware for the login route
 router.post('/login', loginMiddleware, async (req, res) => {
   try {
-    const user = req.user; // Access user from the middleware
-
-    // Generate token with expiration (e.g., 1 hour)
+    const user = req.user;
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    // Send token and user data in response
     res.json({
       message: 'Successfully logged in',
       token,
@@ -25,9 +22,10 @@ router.post('/login', loginMiddleware, async (req, res) => {
       },
     });
   } catch (error) {
-    // Handle errors
+    console.error('Login error:', error.message); // Log the error
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
+
 
 module.exports = router;
