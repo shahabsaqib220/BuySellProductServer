@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/userRegistrationModel'); // Ensure correct path
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const loginMiddleware = require('../middleware/loginMiddleware'); // Adjust the path
+const loginMiddleware = require('../middleware/loginMiddleware');
 
 // Use the middleware for the login route
 router.post('/login', loginMiddleware, async (req, res) => {
@@ -11,7 +9,8 @@ router.post('/login', loginMiddleware, async (req, res) => {
     const user = req.user;
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.json({
+    return res.status(200).json({
+      success: true,
       message: 'Successfully logged in',
       token,
       user: {
@@ -22,10 +21,9 @@ router.post('/login', loginMiddleware, async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Login error:', error.message); // Log the error
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('Login error:', error.message);
+    return res.status(500).json({ success: false, message: 'Server error', error: error.message });
   }
 });
-
 
 module.exports = router;
