@@ -10,7 +10,7 @@ router.get('/profile-image', async (req, res) => {
     if (user) {
       res.status(200).json({ imageUrl: user.profileImageUrl });
     } else {
-      res.status(404).json({ message: 'User not found' });
+      res.status(404).json({ message: 'User not found wow by wow' });
     }
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
@@ -25,7 +25,7 @@ router.post('/profile-image', async (req, res) => {
       await user.save();
       res.status(200).json({ message: 'Image URL saved' });
     } else {
-      res.status(404).json({ message: 'User not found' });
+      res.status(404).json({ message: 'User not found 534f' });
     }
   } catch (error) {
     res.status(500).json({ message: 'Server error' });

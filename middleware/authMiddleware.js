@@ -1,24 +1,19 @@
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const User = require('../models/userRegistrationModel'); // Adjust the path to your User model
 
-const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+const authMiddleware = async (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!token) {
     return res.status(401).json({ message: 'Access denied. No token provided.' });
   }
 
-  const token = authHeader.split(' ')[1];
-
-  
-
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    req.userId = decoded.userId; 
+    req.userId = decoded.userId; // Assuming userId is the key in the decoded token
     next();
   } catch (error) {
-    return res.status(400).json({ message: 'Please Sign In' });
+    return res.status(400).json({ message: 'Invalid token.' });
   }
 };
 

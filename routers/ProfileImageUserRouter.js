@@ -1,20 +1,17 @@
 const express = require('express');
 const multer = require('multer');
-const admin = require('../Controllers/servicesAccount');
-const User = require('../models/userRegistrationModel');
-const authMiddleware = require('../middleware/authMiddleware');
-const serviceAccount = require('../Controllers/servicesAccount')
+const admin = require('../Controllers/servicesAccount'); // Assuming this is your Firebase Admin initialization
+const User = require('../models/userRegistrationModel'); // User model
+const authMiddleware = require('../middleware/authMiddleware'); // Authentication middleware
 const router = express.Router();
 
-// Initialize Firebase Admin SDK
-const bucket = admin.storage().bucket(); 
+// Initialize Firebase Admin SDK for storage bucket
+const bucket = admin.storage().bucket();
 
-
-
-// Configure Multer for file upload
+// Configure Multer for file upload (memory storage)
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 } // 5 MB limit
+  limits: { fileSize: 5 * 1024 * 1024 } // 5 MB file size limit
 });
 
 // Route to update profile image
@@ -35,20 +32,20 @@ router.post('/profile-photo', authMiddleware, upload.single('profileImage'), asy
     const fileName = `${Date.now()}_${file.originalname}`;
     const fileUpload = bucket.file(fileName);
 
-    
+    // Upload file to Firebase storage
     await fileUpload.save(file.buffer, {
       metadata: {
         contentType: file.mimetype
       }
     });
 
-
+    // Generate signed URL for the uploaded file
     const [fileUrl] = await fileUpload.getSignedUrl({
       action: 'read',
-      expires: '03-09-2491'
+      expires: '03-09-2491' // Expires far into the future
     });
 
-    
+    // Update user's profile image URL in the database
     user.profileImageUrl = fileUrl;
     await user.save();
 
@@ -61,15 +58,18 @@ router.post('/profile-photo', authMiddleware, upload.single('profileImage'), asy
     return res.status(500).json({ message: 'Server error' });
   }
 });
+
+// Route to get the user's profile image and username
 router.get('/profile-image', authMiddleware, async (req, res) => {
-  const userId = req.userId;  
+  const userId = req.userId;  // From authMiddleware
+
   try {
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    return res.json({ 
+    return res.json({
       profileImageUrl: user.profileImageUrl,
       username: user.name
     });
@@ -78,9 +78,11 @@ router.get('/profile-image', authMiddleware, async (req, res) => {
     return res.status(500).json({ message: 'Server error' });
   }
 });
+
+// Route to update the username
 router.put('/update-username', authMiddleware, async (req, res) => {
-  const userId = req.userId; 
-  const { newName } = req.body; 
+  const userId = req.userId;  // From authMiddleware
+  const { newName } = req.body;  // New username from request body
 
   if (!newName) {
     return res.status(400).json({ message: 'New username is required' });
@@ -91,6 +93,8 @@ router.put('/update-username', authMiddleware, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+    // Update the username
     user.name = newName;
     await user.save();
 

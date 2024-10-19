@@ -36,7 +36,7 @@ router.get('/ads', authMiddleware, async (req, res) => {
       const startIndex = (page - 1) * limit;
   
       // Fetch ads where adStatus is true
-      const ads = await Ad.find({ adStatus: "available" })
+      const ads = await Ad.find({ adStatus: "sold" })
         .skip(startIndex)
         .limit(limit);
   

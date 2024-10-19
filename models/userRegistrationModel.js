@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
   ads: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ad' }],
 });
 
-// Hash the password before saving the user
+
 userSchema.pre('save', async function (next) {
   // Only hash the password if it has been modified or is new
   if (!this.isModified('password')) return next();
@@ -25,6 +25,7 @@ userSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
+
 
 // Method to compare passwords (for login)
 userSchema.methods.comparePassword = async function (enteredPassword) {

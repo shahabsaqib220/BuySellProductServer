@@ -1,13 +1,25 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const loginMiddleware = require('../middleware/loginMiddleware');
+const User = require('../models/userRegistrationModel'); // Adjust the path to your User model
 
-// Use the middleware for the login route
-router.post('/login', loginMiddleware, async (req, res) => {
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
   try {
-    const user = req.user;
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+    }
+
+    // Compare the hashed password with the entered password using the model method
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+    }
+
+    // If password matches, generate a token
+    const token = user.generateAuthToken();
 
     return res.status(200).json({
       success: true,

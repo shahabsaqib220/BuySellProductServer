@@ -38,21 +38,21 @@ app.use(express.json());
 
 
 
+app.use(process.env.API_V1_OAUTH, authRoutes);
+app.use(process.env.API_V2_OAUTH,  profileImage);
+app.use(process.env.API_V3_OAUTH, userAds);
+app.use(process.env.API_V4_OAUTH,userLogin);
+app.use(process.env.API_V5_OAUTH, productList);
+app.use(process.env.API_V6_OAUTH, myAdsRouter);
+app.use(process.env.API_V7_OAUTH, adDelete);
+app.use(process.env.API_V8_OAUTH,ProductDetailsRouter );
+app.use(process.env.API_V9_OAUTH,OtherRelatedProductRouter );
+app.use(process.env.API_V10_OAUTH, userProfileImage );
+app.use(process.env.API_V11_OAUTH, soldOutRouter );
+app.use(process.env.API_V12_OAUTH, userCartItem );
+app.use(process.env.API_V13_OAUTH, cartItemRouter );
+app.use(process.env.API_V14_OAUTH, PasswordChangeRouter);
 
-app.use("/api/auth", authRoutes);
-app.use("/api/profile-image",  profileImage);
-app.use("/api/usersads", userAds);
-app.use("/api/userlogin",userLogin);
-app.use("/api/allads", productList);
-app.use("/api/viewsads", myAdsRouter);
-app.use("/api/deletead", adDelete);
-app.use("/api/product/details",ProductDetailsRouter );
-app.use("/api/product/details/others",OtherRelatedProductRouter );
-app.use("/api/user-profile-image", userProfileImage );
-app.use("/api/userproducts/solded", soldOutRouter );
-app.use("/api/usercart/item", userCartItem );
-app.use("/api/usercart/navigate", cartItemRouter );
-app.use("/api/security", PasswordChangeRouter);
 
 
 
@@ -70,21 +70,17 @@ app.get('/', (req, res) => {
 
 
 
-
-const connectDB = async () => {
+  const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_DB_URL,{
-           
-        })
-        console.log("MongoDb Connected");
-    
-        
+      await mongoose.connect(process.env.MONGO_DB_URL, {
+   
+      });
+      console.log("MongoDB Connected");
     } catch (error) {
-        console.error("Eorror While Connecting", error)
-        
+      console.error("Error While Connecting", error);
     }
-
-}
+  };
+  
 
 // Start server and connect to DB
 app.listen(PORT, () => {
