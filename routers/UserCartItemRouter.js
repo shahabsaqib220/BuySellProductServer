@@ -95,41 +95,51 @@ router.delete('/:itemId', authenticate, async (req, res) => {
 
 
 // Endpoint to fetch items from the shopping cart
+// Endpoint to fetch items from the shopping cart
 router.get("/cart", authenticate, async (req, res) => {
   const userId = req.userId; // Get userId from the authentication middleware
 
   try {
-    // Find the cart items and populate the ad details
+    // Find the cart items and populate the ad details, excluding deleted ads
     const cartItems = await Cart.find({ userId }).populate('adId');
-    
-    if (!cartItems || cartItems.length === 0) {
+
+    // Filter out cart items where the associated ad is deleted
+    const validCartItems = cartItems.filter(cartItem => {
+      const ad = cartItem.adId;
+      return ad && ad.adStatus !== "deleted"; // Only keep items with ads that are not deleted
+    });
+
+    if (!validCartItems || validCartItems.length === 0) {
       return res.status(404).json({ message: "No cart items found" });
     }
 
-    // Iterate over cart items and check the ad status
-    const updatedCartItems = await Promise.all(cartItems.map(async (cartItem) => {
+    // Iterate over valid cart items to construct the response
+    const updatedCartItems = await Promise.all(validCartItems.map(async (cartItem) => {
       const ad = cartItem.adId; // Access ad details populated by 'populate'
+      const adStatus = ad ? ad.adStatus : "deleted"; // Determine the ad status
 
-      if (!ad) {
-        cartItem.adStatus = "deleted"; 
-      } else if (ad.adStatus === "sold") {
-        cartItem.adStatus = "sold"; 
-      } else {
-        cartItem.adStatus = "available"; 
-      }
-
-      await cartItem.save();
-
+      // Construct the response for each cart item
       return {
-        ...cartItem.toObject(), // Convert the cartItem to an object to append adId
-        adId: ad._id // Add adId to the response
+        _id: cartItem._id, // Include the cart item ID
+        adId: ad ? ad._id : null, // Include adId if it exists
+        adDetails: ad ? {
+          model: ad.model,
+          condition: ad.condition,
+          price: ad.price,
+          location: ad.location,
+          images: ad.images // Ensure images are included
+        } : {}, // Return an empty object if ad does not exist
+        adStatus: adStatus // Include updated ad status
       };
     }));
 
-    res.json(updatedCartItems);
+    res.json(updatedCartItems); // Send the updated cart items
   } catch (error) {
     res.status(500).json({ message: "Error fetching cart items", error });
   }
 });
+
+
+
 
 module.exports = router;
