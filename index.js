@@ -53,7 +53,7 @@ app.use(process.env.API_V11_OAUTH, soldOutRouter );
 app.use(process.env.API_V12_OAUTH, userCartItem );
 app.use(process.env.API_V13_OAUTH, cartItemRouter );
 app.use(process.env.API_V14_OAUTH, PasswordChangeRouter);
-app.use(process.env.API_V15_OAUTH,CatagoryAdsRouter)
+// app.use(process.env.API_V15_OAUTH,CatagoryAdsRouter)
 
 
 
