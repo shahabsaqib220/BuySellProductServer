@@ -20,6 +20,7 @@ const soldOutRouter = require("./routers/UserSoldOutProductRouter")
 const userCartItem = require("./routers/UserCartItemRouter")
 const cartItemRouter = require("./routers/CartItemNavigatiorRouter")
 const PasswordChangeRouter = require("./routers/PasswordChangeRouter")
+const CatagoryAdsRouter = require("./routers/CatagoryAdsRouter")
 const app = express();
 
 require('dotenv').config();
@@ -52,6 +53,7 @@ app.use(process.env.API_V11_OAUTH, soldOutRouter );
 app.use(process.env.API_V12_OAUTH, userCartItem );
 app.use(process.env.API_V13_OAUTH, cartItemRouter );
 app.use(process.env.API_V14_OAUTH, PasswordChangeRouter);
+app.use(process.env.API_V15_OAUTH,CatagoryAdsRouter)
 
 
 
