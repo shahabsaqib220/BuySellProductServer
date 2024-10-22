@@ -82,12 +82,26 @@ app.get('/', (req, res) => {
       console.error("Error While Connecting", error);
     }
   };
+
+
+  const startServer = () => {
+    try {
+      connectDB(process.env.MONGODB_URL)
+      app.listen(5000, () => {
+        console.log(`Runiing on the PORT ${PORT}`);
+      });
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+
+  startServer()
+
+
+  
   
 
-// Start server and connect to DB
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    connectDB();
-  });
+
 
 
