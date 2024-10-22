@@ -1,15 +1,6 @@
 {
-
-"name": "your-project-name",
-  "version": "1.0.0",
-  "main": "server.js", 
-  "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon server.js"
-  },
-
-
   "dependencies": {
+    "@vercel/node": "^3.2.23",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "connect-timeout": "^1.9.0",
