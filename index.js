@@ -1,4 +1,5 @@
 const express = require("express");
+const app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
 const errorHandler = require('./middleware/errorHandler');
@@ -21,7 +22,6 @@ const userCartItem = require("./routers/UserCartItemRouter")
 const cartItemRouter = require("./routers/CartItemNavigatiorRouter")
 const PasswordChangeRouter = require("./routers/PasswordChangeRouter")
 const CatagoryAdsRouter = require("./routers/CatagoryAdsRouter")
-const app = express();
 
 require('dotenv').config();
 
@@ -57,17 +57,19 @@ app.get('/', (req, res) => {
 });
 
 const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_DB_URL, {
-        });
-        console.log("MongoDB Connected");
-    } catch (error) {
-        console.error("Error While Connecting", error);
-    }
+  try {
+    await mongoose.connect(process.env.MONGO_DB_URL, {});
+    console.log("MongoDB Connected");
+  } catch (error) {
+    console.error("Error While Connecting", error);
+  }
 };
 
-app.listen(PORT, () => {
-    console.log(`Running on PORT ${PORT}`);
-    connectDB();
-    console.log("All Done")
-});
+// Connect to MongoDB when the app starts
+connectDB();
+
+// Remove the app.listen() part for Vercel deployment
+// Instead, export the app
+module.exports = app;
+
+
