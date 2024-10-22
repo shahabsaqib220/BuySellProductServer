@@ -16,5 +16,8 @@
     "nodemailer": "^6.9.15",
     "nodemon": "^3.1.4",
     "p-timeout": "^6.1.2"
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
