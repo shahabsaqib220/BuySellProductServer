@@ -77,10 +77,7 @@ app.get('/', (req, res) => {
       await mongoose.connect(process.env.MONGO_DB_URL, {
    
       });
-      
-      
       console.log("MongoDB Connected");
-
     } catch (error) {
       console.error("Error While Connecting", error);
     }
