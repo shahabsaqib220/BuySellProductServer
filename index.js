@@ -84,19 +84,11 @@ app.get('/', (req, res) => {
   };
 
 
-  const startServer = () => {
-    try {
-      connectDB(process.env.MONGODB_URL)
-      app.listen(5000, () => {
-        console.log(`Runiing on the PORT ${PORT}`);
-      });
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
-
-  startServer()
+  app.listen(PORT, () => {
+    console.log(`Running on PORT ${PORT}`);
+    connectDB();
+    console.log("All Done")
+});
 
 
   
