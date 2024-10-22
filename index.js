@@ -4,72 +4,70 @@ const mongoose = require("mongoose");
 const errorHandler = require('./middleware/errorHandler');
 require('express-async-errors');
 const authRoutes = require('./routers/registrationUserRouter');
-const loginUser = require("./routers/UserLoginRouter");
+const loginUser = require("./routers/UserLoginRouter")
 const profileImage = require("./routers/ProfileImageUserRouter");
-const authMiddleware = require('./middleware/authMiddleware');
-const userAds = require('./routers/UsersAdsRouter');
-const userLogin = require('./routers/UserLoginRouter');
-const adDelete = require("./routers/DeleteUserAdRouter");
-const productList = require('./routers/ProductListRouter');
-const OtherRelatedProductRouter = require("./routers/OtherRelatedProductRouter");
-const myAdsRouter = require('./routers/UserViewAdsRouter');
-const ProductDetailsRouter = require('./routers/ProductDetailsRouter');
-const userProfileImage = require('./routers/userProfileImageRouter');
+const authMiddleware = require('./middleware/authMiddleware')
+const userAds = require('./routers/UsersAdsRouter')
+const userLogin= require('./routers/UserLoginRouter')
+const adDelete = require("./routers/DeleteUserAdRouter")
+const productList = require('./routers/ProductListRouter')
+const OtherRelatedProductRouter = require("./routers/OtherRelatedProductRouter")
+const myAdsRouter = require('./routers/UserViewAdsRouter')
+const ProductDetailsRouter = require('./routers/ProductDetailsRouter')
+const userProfileImage = require('./routers/userProfileImageRouter')
 const bodyParser = require('body-parser');
-const soldOutRouter = require("./routers/UserSoldOutProductRouter");
-const userCartItem = require("./routers/UserCartItemRouter");
-const cartItemRouter = require("./routers/CartItemNavigatiorRouter");
-const PasswordChangeRouter = require("./routers/PasswordChangeRouter");
-const CatagoryAdsRouter = require("./routers/CatagoryAdsRouter");
-
+const soldOutRouter = require("./routers/UserSoldOutProductRouter")
+const userCartItem = require("./routers/UserCartItemRouter")
+const cartItemRouter = require("./routers/CartItemNavigatiorRouter")
+const PasswordChangeRouter = require("./routers/PasswordChangeRouter")
+const CatagoryAdsRouter = require("./routers/CatagoryAdsRouter")
 const app = express();
+
 require('dotenv').config();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+const PORT = process.env.PORT || 3000;
+
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// Set up your routes
-app.use(process.env.API_V1_OAUTH, authRoutes);
-app.use(process.env.API_V2_OAUTH, profileImage);
-app.use(process.env.API_V3_OAUTH, userAds);
-app.use(process.env.API_V4_OAUTH, userLogin);
-app.use(process.env.API_V5_OAUTH, productList);
-app.use(process.env.API_V6_OAUTH, myAdsRouter);
-app.use(process.env.API_V7_OAUTH, adDelete);
-app.use(process.env.API_V8_OAUTH, ProductDetailsRouter);
-app.use(process.env.API_V9_OAUTH, OtherRelatedProductRouter);
-app.use(process.env.API_V10_OAUTH, userProfileImage);
-app.use(process.env.API_V11_OAUTH, soldOutRouter);
-app.use(process.env.API_V12_OAUTH, userCartItem);
-app.use(process.env.API_V13_OAUTH, cartItemRouter);
-app.use(process.env.API_V14_OAUTH, PasswordChangeRouter);
-app.use(process.env.API_V15_OAUTH, CatagoryAdsRouter);
+app.use('/api/v1/oauth', authRoutes);
+app.use('/api/v2/oauth',  profileImage);
+app.use('/api/v3/oauth', userAds);
+app.use('/api/v4/oauth', userLogin);
+app.use('/api/v5/oauth', productList);
+app.use('/api/v6/oauth', myAdsRouter);
+app.use('/api/v7/oauth', adDelete);
+app.use('/api/v8/oauth', ProductDetailsRouter);
+app.use('/api/v9/oauth', OtherRelatedProductRouter);
+app.use('/api/v10/oauth', userProfileImage);
+app.use('/api/v11/oauth', soldOutRouter);
+app.use('/api/v12/oauth', userCartItem);
+app.use('/api/v13/oauth', cartItemRouter);
+app.use('/api/v14/oauth', PasswordChangeRouter);
+app.use('/api/v15/oauth', CatagoryAdsRouter);
+
+app.use(authMiddleware); // Add authentication middleware
+app.use(errorHandler); // Add error handling middleware
 
 app.get('/', (req, res) => {
     res.send('Hello from Express');
 });
 
-// Connect to MongoDB only on cold starts
-let isConnected = false;
-
 const connectDB = async () => {
-    if (isConnected) return; // Prevent multiple connections
     try {
         await mongoose.connect(process.env.MONGO_DB_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
         });
-        isConnected = true;
         console.log("MongoDB Connected");
     } catch (error) {
         console.error("Error While Connecting", error);
     }
 };
 
-// Export the app for Vercel
-module.exports = async (req, res) => {
-    await connectDB(); // Ensure DB connection before handling the request
-    app(req, res); // Pass the request and response to the Express app
-};
+app.listen(PORT, () => {
+    console.log(`Running on PORT ${PORT}`);
+    connectDB();
+    console.log("All Done")
+});
