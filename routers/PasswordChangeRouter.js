@@ -3,7 +3,7 @@ const User = require("../models/userRegistrationModel");
 const ChangePassword = require("../models/ChangePasswordModel"); 
 const crypto = require("crypto");
 const authMiddleware = require("../middleware/authMiddleware");
-const bcrypt = require('bcryptjs');
+const bcryptjs = require('bcryptjs');
 
 const router = express.Router();
 const nodemailer = require("nodemailer");
