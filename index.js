@@ -3,6 +3,9 @@ const app = express();
 
 // Basic middleware
 app.use(express.json());
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to the API' });
+});
 
 // Test route
 app.get('/api/test', (req, res) => {
@@ -10,9 +13,6 @@ app.get('/api/test', (req, res) => {
 });
 
 // Root route
-app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to the API' });
-});
 
 // For local development
 if (process.env.NODE_ENV !== 'production') {
