@@ -49,10 +49,10 @@ app.use(process.env.API_V7_OAUTH, adDelete);
 app.use(process.env.API_V8_OAUTH,ProductDetailsRouter );
 app.use(process.env.API_V9_OAUTH,OtherRelatedProductRouter );
 app.use(process.env.API_V10_OAUTH, userProfileImage );
-app.use(process.env.API_V14_OAUTH, PasswordChangeRouter);
 app.use(process.env.API_V11_OAUTH, soldOutRouter );
 app.use(process.env.API_V12_OAUTH, userCartItem );
 app.use(process.env.API_V13_OAUTH, cartItemRouter );
+app.use(process.env.API_V14_OAUTH, PasswordChangeRouter);
 app.use(process.env.API_V15_OAUTH,CatagoryAdsRouter)
 
 
