@@ -77,6 +77,8 @@ app.get('/', (req, res) => {
       await mongoose.connect(process.env.MONGO_DB_URL, {
    
       });
+      console.log(process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'), 
+)
       
       console.log("MongoDB Connected");
 
