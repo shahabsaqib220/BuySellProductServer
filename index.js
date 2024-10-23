@@ -1,8 +1,10 @@
-const express = require("express");
+const express = require('express');
 const app = express();
 
-app.get("/", (req, res) => res.send("Express on Vercel"));
+// Test route to check if the server is working
+app.get('/', (req, res) => {
+  res.send('Hello from Express');
+});
 
-app.listen(3000, () => console.log("Server ready on port 3000."));
-
+// Export the app for Vercel to use
 module.exports = app;
