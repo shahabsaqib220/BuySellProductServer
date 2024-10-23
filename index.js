@@ -1,26 +1,10 @@
-const express = require("express");
+const express = require('express');
 const app = express();
 
-// Basic middleware
-app.use(express.json());
+// Basic route for testing Vercel deployment
 app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to the API' });
+  res.send('Hello from Express');
 });
 
-// Test route
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'API is working' });
-});
-
-// Root route
-
-// For local development
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log("All Done")
-  });
-}
-
+// Exporting the app for Vercel
 module.exports = app;
