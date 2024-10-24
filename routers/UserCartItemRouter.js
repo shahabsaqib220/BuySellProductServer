@@ -24,11 +24,11 @@ router.post("/shopping", authenticate, async (req, res) => {
     if (cartItem) {
       cartItem.quantity += quantity;
 
-      // Fetch the latest ad status
+    
       const currentAd = await Ad.findById(adId);
       if (currentAd.adStatus !== cartItem.adStatus) {
         console.log(`Updating cart item adStatus from ${cartItem.adStatus} to ${currentAd.adStatus}`);
-        cartItem.adStatus = currentAd.adStatus; // Update cart item's adStatus
+        cartItem.adStatus = currentAd.adStatus; 
       }
 
       await cartItem.save();
