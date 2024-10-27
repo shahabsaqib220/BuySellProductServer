@@ -98,8 +98,8 @@ router.post('/register', async (req, res) => {
     const newUser = new User({
       name,
       email,
-      password, // Send the plain password; it will be hashed in the model
-      securityQuestions, // Save security questions
+      password, // Password will be hashed automatically
+      securityQuestions, // Answers will be hashed in the pre-save hook
     });
 
     // Save the user to the database
@@ -114,6 +114,7 @@ router.post('/register', async (req, res) => {
     return res.status(500).json({ message: 'Registration failed. Please try again.' });
   }
 });
+
 
 
 
