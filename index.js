@@ -58,6 +58,7 @@ app.use(process.env.API_V14_OAUTH, PasswordChangeRouter);
 app.use(process.env.API_V15_OAUTH,CatagoryAdsRouter)
 app.use(process.env.API_V16_OAUTH,FilteredAdsRouter)
 app.use(process.env.API_V17_OAUTH,UserForgetPasswordRouter)
+app.use(process.env.API_V17_OAUTH,UserForgetPasswordRouter)
 
 
 
