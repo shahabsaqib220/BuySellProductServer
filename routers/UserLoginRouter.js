@@ -26,6 +26,7 @@ router.post('/login', async (req, res) => {
       message: 'Successfully logged in',
       token,
       user: {
+        profileImageUrl:user.profileImageUrl,
         id: user._id,
         name: user.name,
         email: user.email,

@@ -7,6 +7,7 @@ router.delete("/deletead/:id", authMiddleware, async (req, res) => {
     const adId = req.params.id;
 
     try {
+        
         const ad = await Ad.findOne({ _id: adId }); 
 
         if (!ad) {
