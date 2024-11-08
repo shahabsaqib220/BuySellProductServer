@@ -29,6 +29,8 @@ const FilteredAdsRouter = require("./routers/FiteredAdsRouter");
 const CatagoryAdsRouter = require("./routers/CatagoryAdsRouter");
 const UserForgetPasswordRouter = require("./routers/UserForgetPasswordRouter");
 const UserChatRouter = require("./routers/UsersChatRouter");
+const ReceiversProfileRouter = require("./routers/ReceiversProfileRouter")
+const socketIo = require('socket.io');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -38,7 +40,6 @@ app.use(cors());
 const PORT = process.env.PORT || 3000;
 
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: '*' } });
 
 // API Routes
 app.use(process.env.API_V1_OAUTH, authRoutes);
@@ -59,67 +60,70 @@ app.use(process.env.API_V15_OAUTH, CatagoryAdsRouter);
 app.use(process.env.API_V16_OAUTH, FilteredAdsRouter);
 app.use(process.env.API_V17_OAUTH, UserForgetPasswordRouter);
 app.use(process.env.API_V18_OAUTH, UserChatRouter);
+app.use(process.env.API_V19_OAUTH, ReceiversProfileRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello from Express');
 });
 
-// Socket.io Setup
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
-  socket.on('joinRoom', ({ senderId, receiverId }) => {
-      const room = [senderId, receiverId].sort().join('_');
-      socket.join(room);
-      console.log(`User joined room: ${room}`);
+io.on('connection', (socket) => {
+  console.log('New client connected:', socket.id);
+
+  // Join user to a room based on user ID
+  socket.on('joinRoom', (userId) => {
+    socket.join(userId);
+    console.log(`User ${userId} joined room ${userId}`);
   });
 
   socket.on('sendMessage', async (data) => {
-      const { senderId, receiverId, message } = data;
-      const room = [senderId, receiverId].sort().join('_');
+    const { senderId, receiverId, message } = data;
 
-      // Save message to the database
-      try {
-          const newMessage = await Message.create({
-              senderId,
-              receiverId,
-              message
-          });
-          io.to(room).emit('receiveMessage', newMessage);  // Emit the saved message with timestamp
-      } catch (error) {
-          console.error('Error saving message:', error);
-      }
+    try {
+      // Send message to save in the database
+      const response = await fetch('http://localhost:5000/api/conservation/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senderId, receiverId, message })
+      });
+
+      if (!response.ok) throw new Error('Failed to save message');
+      
+      const savedMessage = await response.json();
+
+      // Emit message to the receiver's room
+      io.to(receiverId).emit('receiveMessage', savedMessage);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  });
+
+  // Typing indicators
+  socket.on('startTyping', (data) => {
+    const { receiverId } = data;
+    io.to(receiverId).emit('typing', data);
+  });
+
+  socket.on('stopTyping', (data) => {
+    const { receiverId } = data;
+    io.to(receiverId).emit('stopTyping', data);
   });
 
   socket.on('disconnect', () => {
-      console.log('User disconnected:', socket.id);
+    console.log('Client disconnected:', socket.id);
   });
-  socket.on('userTyping', ({ senderId, receiverId }) => {
-    const room = [senderId, receiverId].sort().join('_');
-    socket.to(room).emit('userTyping', { senderId });
-});
-  socket.on('messageSeen', async ({ messageId, receiverId }) => {
-        try {
-            // Update the "seen" status in the database
-            const updatedMessage = await Message.findByIdAndUpdate(
-                messageId,
-                { seen: true },
-                { new: true }
-            );
-
-            if (updatedMessage) {
-                const room = [updatedMessage.senderId, receiverId].sort().join('_');
-                // Emit an event to notify the sender that the message was seen
-                io.to(room).emit('messageSeen', messageId);
-                console.log(`Message ${messageId} marked as seen in room: ${room}`);
-            }
-        } catch (error) {
-            console.error('Error marking message as seen:', error);
-        }
-    });
 });
 
-// Connect to MongoDB
+
+
+
+// Connect our backend Express application with the database
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_DB_URL, {});
@@ -129,12 +133,7 @@ const connectDB = async () => {
   }
 };
 
-
-
-
-
-
-// Start the server
+// Starting the Express JS server
 server.listen(PORT, () => {
   console.log(`Server running on PORT ${PORT}`);
   connectDB();
