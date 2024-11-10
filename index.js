@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -6,7 +7,6 @@ require('express-async-errors');
 const http = require('http');
 const { Server } = require('socket.io');
 const Message = require('./models/UsersChatModel');
-require('dotenv').config();
 const bodyParser = require('body-parser');
 
 const authRoutes = require('./routers/registrationUserRouter');
@@ -41,6 +41,11 @@ const PORT = process.env.PORT || 3000;
 
 const server = http.createServer(app);
 
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
 // API Routes
 app.use(process.env.API_V1_OAUTH, authRoutes);
 app.use(process.env.API_V2_OAUTH, profileImage);
@@ -73,6 +78,9 @@ const io = socketIo(server, {
   }
 });
 
+
+
+
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
 
@@ -82,27 +90,10 @@ io.on('connection', (socket) => {
     console.log(`User ${userId} joined room ${userId}`);
   });
 
-  socket.on('sendMessage', async (data) => {
-    const { senderId, receiverId, message } = data;
 
-    try {
-      // Send message to save in the database
-      const response = await fetch('http://localhost:5000/api/conservation/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ senderId, receiverId, message })
-      });
 
-      if (!response.ok) throw new Error('Failed to save message');
-      
-      const savedMessage = await response.json();
 
-      // Emit message to the receiver's room
-      io.to(receiverId).emit('receiveMessage', savedMessage);
-    } catch (error) {
-      console.error('Error sending message:', error);
-    }
-  });
+  
 
   // Typing indicators
   socket.on('startTyping', (data) => {
@@ -115,10 +106,13 @@ io.on('connection', (socket) => {
     io.to(receiverId).emit('stopTyping', data);
   });
 
+
+
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
   });
 });
+
 
 
 
