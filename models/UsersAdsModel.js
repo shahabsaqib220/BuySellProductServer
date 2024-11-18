@@ -38,11 +38,11 @@ const adsSchema = new mongoose.Schema({
     type: {
       type: String, // 'Point'
       enum: ['Point'], // 'Point' is the only allowed value
-      required: true
+      required: false
     },
     coordinates: {
       type: [Number], // Array of numbers: [longitude, latitude]
-      required: true
+      required: false
     },
     readable: { // Human-readable location field
       type: String,

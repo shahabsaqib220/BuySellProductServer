@@ -30,6 +30,7 @@ const CatagoryAdsRouter = require("./routers/CatagoryAdsRouter");
 const UserForgetPasswordRouter = require("./routers/UserForgetPasswordRouter");
 const UserChatRouter = require("./routers/UsersChatRouter");
 const ReceiversProfileRouter = require("./routers/ReceiversProfileRouter")
+const AdEditRouter = require("./routers/UserExistingAdEditRouter")
 const socketIo = require('socket.io');
 
 const app = express();
@@ -37,9 +38,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 
+
 const PORT = process.env.PORT || 3000;
 
 const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Replace with your client URL if it's not localhost
+    methods: ["GET", "POST"],
+  },
+});
+
+
 
 app.use((req, res, next) => {
   req.io = io;
@@ -66,17 +77,13 @@ app.use(process.env.API_V16_OAUTH, FilteredAdsRouter);
 app.use(process.env.API_V17_OAUTH, UserForgetPasswordRouter);
 app.use(process.env.API_V18_OAUTH, UserChatRouter);
 app.use(process.env.API_V19_OAUTH, ReceiversProfileRouter);
+app.use('/api/existing', AdEditRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello from Express');
 });
 
-const io = socketIo(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
-});
+
 
 
 

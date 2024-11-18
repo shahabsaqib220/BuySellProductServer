@@ -139,4 +139,33 @@ router.put('/markAsSeen', async (req, res) => {
   }
 });
 
+// Deleting a message of a sender by the message id, so that we are using params for the Id, but we are using req.params.id
+router.delete('/delete/message/:id', async (req,res) =>{
+  try {
+    const messageId = req.params.id;
+
+    // Deleting the message by their ID so first of all we need to find the message by the id and then delete the message
+    const message = await Message.findByIdAndDelete(messageId)
+
+    // If there is no message, then we will return the fucking error message that the message is not found
+    if (!message) {
+      return res.status(404).json({error: 'Message not found' });
+    }
+
+    // If the messate is found then we deletee the message and return the success message
+    res.json({ message: 'Message deleted successfully', message});
+
+
+
+    
+
+    
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete message' });
+
+    
+  }
+
+})
+
 module.exports = router;
