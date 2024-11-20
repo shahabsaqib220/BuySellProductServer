@@ -1,90 +1,109 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Ad = require('../models/UsersAdsModel'); // Adjust the path to your Ad model
-const authMiddleware = require('../middleware/authMiddleware'); // Middleware to verify JWT token
-const admin = require('../Controllers/servicesAccount'); // Reuse the initialized admin instance
-const multer = require('multer');
-const { v4: uuidv4 } = require('uuid'); // For generating unique filenames
+const Ad = require("../models/UsersAdsModel"); // Adjust the path to your Ad model
+const admin = require("../Controllers/servicesAccount"); // Firebase admin instance
+const multer = require("multer");
+const { v4: uuidv4 } = require("uuid"); // Generate unique filenames
 
 // Set up multer for file uploads
 const upload = multer({ storage: multer.memoryStorage() });
 
 // Update Ad Route
-router.put('/user/ad/:id', authMiddleware, upload.array('images', 5), async (req, res) => {
+router.put("/user/ad/:id", upload.array("images", 5), async (req, res) => {
   const adId = req.params.id;
-
-  // Extract update data from the request body
   const updateData = req.body;
+  const removedImages = req.body.removedImages ? JSON.parse(req.body.removedImages) : [];
 
   try {
-    // Handle image uploads
+    const existingAd = await Ad.findById(adId);
+    if (!existingAd) {
+      return res.status(404).json({ message: "Ad not found" });
+    }
+
+    let updatedImages = [...existingAd.images]; // Start with existing images
+    const newImageUrls = [];
+
+    // Handle new image uploads
     if (req.files && req.files.length > 0) {
       const bucket = admin.storage().bucket();
-      const imageUrls = [];
-
       for (const file of req.files) {
         const blob = bucket.file(`ads/${uuidv4()}_${file.originalname}`);
         const blobStream = blob.createWriteStream({
-          metadata: {
-            contentType: file.mimetype,
-          },
+          metadata: { contentType: file.mimetype },
         });
 
-        // Upload the file to Firebase
         await new Promise((resolve, reject) => {
-          blobStream.on('error', (error) => reject(error));
-          blobStream.on('finish', () => {
-            // Get the public URL of the uploaded file
+          blobStream.on("error", reject);
+          blobStream.on("finish", () => {
             const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-            imageUrls.push(publicUrl);
+            newImageUrls.push(publicUrl);
             resolve();
           });
           blobStream.end(file.buffer);
         });
       }
-
-      // Update the images in the updateData
-      updateData.images = imageUrls;
     }
 
-    // Handle location data if provided and validate
+    // Remove images specified in `removedImages` (URLs)
+    for (const imageUrl of removedImages) {
+      // Delete from cloud storage
+      const fileName = imageUrl.split("/").pop();
+      const file = admin.storage().bucket().file(`ads/${fileName}`);
+      await file.delete().catch((err) => {
+        console.error(`Failed to delete file ${fileName}:`, err.message);
+      });
+
+      // Remove from `updatedImages`
+      updatedImages = updatedImages.filter((img) => img !== imageUrl);
+    }
+
+    // Add new images to the updated list
+    updatedImages.push(...newImageUrls);
+
+    // Ensure at least one image exists
+    if (updatedImages.length === 0) {
+      return res.status(400).json({ message: "At least one image is required." });
+    }
+
+    updateData.images = updatedImages; // Update the images field in updateData
+
+    // Handle location data if provided
     if (updateData.location) {
       let locationData;
-
-      // Check if location is a string and parse it
       try {
         locationData = JSON.parse(updateData.location);
       } catch (error) {
         return res.status(400).json({ message: "Invalid location data format" });
       }
 
-      // Ensure that human-readable location and coordinates are provided and valid
-      if (!locationData.readable || !Array.isArray(locationData.coordinates) || locationData.coordinates.length !== 2) {
+      if (
+        !locationData.readable ||
+        !Array.isArray(locationData.coordinates) ||
+        locationData.coordinates.length !== 2
+      ) {
         return res.status(400).json({ message: "Invalid location data provided" });
       }
 
-      // Format the location into GeoJSON
       updateData.location = {
-        type: 'Point',
-        coordinates: [locationData.coordinates[0], locationData.coordinates[1]], // Longitude, Latitude
-        readable: locationData.readable, // Human-readable address
+        type: "Point",
+        coordinates: [locationData.coordinates[0], locationData.coordinates[1]],
+        readable: locationData.readable,
       };
     }
 
-    // Find the ad by ID and update it
+    // Update the ad in the database
     const updatedAd = await Ad.findByIdAndUpdate(adId, updateData, {
-      new: true, // Return the updated document
-      runValidators: true, // Validate the update against the model
+      new: true,
+      runValidators: true,
     });
 
-    if (!updatedAd) {
-      return res.status(404).json({ message: 'Ad not found' });
-    }
-
-    res.status(200).json(updatedAd);
+    res.status(200).json({
+      message: "Ad updated successfully",
+      ad: updatedAd,
+    });
   } catch (error) {
-    console.error('Error updating ad:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error(error);
+    res.status(500).json({ message: "An error occurred while updating the ad", error: error.message });
   }
 });
 
