@@ -45,9 +45,13 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*", // Replace with your client URL if it's not localhost
+    origin: "*", 
     methods: ["GET", "POST"],
   },
+});
+
+app.get("/", (req, res) => {
+  res.send("Hello from Express");
 });
 
 
@@ -79,9 +83,7 @@ app.use(process.env.API_V18_OAUTH, UserChatRouter);
 app.use(process.env.API_V19_OAUTH, ReceiversProfileRouter);
 app.use('/api/existing', AdEditRouter);
 
-app.get('/', (req, res) => {
-  res.send('Hello from Express');
-});
+
 
 
 

@@ -4,12 +4,13 @@ const Ad = require("../models/UsersAdsModel"); // Adjust the path to your Ad mod
 const admin = require("../Controllers/servicesAccount"); // Firebase admin instance
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid"); // Generate unique filenames
+const authMiddleware = require("../middleware/authMiddleware");
 
 // Set up multer for file uploads
 const upload = multer({ storage: multer.memoryStorage() });
 
 // Update Ad Route
-router.put("/user/ad/:id", upload.array("images", 5), async (req, res) => {
+router.put("/user/ad/:id", authMiddleware, upload.array("images", 5), async (req, res) => {
   const adId = req.params.id;
   const updateData = req.body;
   const removedImages = req.body.removedImages ? JSON.parse(req.body.removedImages) : [];
@@ -33,6 +34,8 @@ router.put("/user/ad/:id", upload.array("images", 5), async (req, res) => {
         });
 
         await new Promise((resolve, reject) => {
+
+          
           blobStream.on("error", reject);
           blobStream.on("finish", () => {
             const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
