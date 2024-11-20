@@ -11,6 +11,8 @@
       "src": "/(.*)",
       "dest": "index.js"
     }
-  ]
- 
+  ],
+  "env": {
+    "YOUR_ENV_VARIABLE": "value" 
+  }
 }
