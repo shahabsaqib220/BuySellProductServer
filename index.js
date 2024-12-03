@@ -63,27 +63,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// API Routes
-app.use(process.env.API_V1_OAUTH, authRoutes);
-app.use(process.env.API_V2_OAUTH, profileImage);
-app.use(process.env.API_V3_OAUTH, userAds);
-app.use(process.env.API_V4_OAUTH, userLogin);
-app.use(process.env.API_V5_OAUTH, productList);
-app.use(process.env.API_V6_OAUTH, myAdsRouter);
-app.use(process.env.API_V7_OAUTH, adDelete);
-app.use(process.env.API_V8_OAUTH, ProductDetailsRouter);
-app.use(process.env.API_V9_OAUTH, OtherRelatedProductRouter);
-app.use(process.env.API_V10_OAUTH, userProfileImage);
-app.use(process.env.API_V11_OAUTH, soldOutRouter);
-app.use(process.env.API_V12_OAUTH, userCartItem);
-app.use(process.env.API_V13_OAUTH, cartItemRouter);
-app.use(process.env.API_V14_OAUTH, PasswordChangeRouter);
-app.use(process.env.API_V15_OAUTH, CatagoryAdsRouter);
-app.use(process.env.API_V16_OAUTH, FilteredAdsRouter);
-app.use(process.env.API_V17_OAUTH, UserForgetPasswordRouter);
-app.use(process.env.API_V18_OAUTH, UserChatRouter);
-app.use(process.env.API_V19_OAUTH, ReceiversProfileRouter);
-app.use('/api/existing', AdEditRouter);
 
 
 
